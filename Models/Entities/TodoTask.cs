@@ -11,5 +11,6 @@
         public string Priority { get; set; }
         public string List { get; set; }
         public string Email { get; set; }
+        public string DueDate { get; set; }
     }
 }
