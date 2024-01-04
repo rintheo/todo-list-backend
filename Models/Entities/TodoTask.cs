@@ -8,6 +8,6 @@
         public bool IsCompleted { get; set; }
         public long Index { get; set; }
         public string Priority { get; set; }
-
+        public string List { get; set; }
     }
 }

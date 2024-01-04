@@ -6,7 +6,7 @@ using todo_list_backend.Models.Entities;
 namespace todo_list_backend.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/")]
     public class TodoTasksController : Controller
     {
         private readonly TodoTasksDbContext todoTasksDbContext;

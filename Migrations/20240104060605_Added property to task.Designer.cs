@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using todo_list_backend.Data;
 
@@ -11,9 +12,11 @@ using todo_list_backend.Data;
 namespace todo_list_backend.Migrations
 {
     [DbContext(typeof(TodoTasksDbContext))]
-    partial class TodoTasksDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240104060605_Added property to task")]
+    partial class Addedpropertytotask
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
