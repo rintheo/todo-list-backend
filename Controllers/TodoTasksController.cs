@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using todo_list_backend.Data;
 using todo_list_backend.Models.Entities;
 
@@ -7,6 +9,7 @@ namespace todo_list_backend.Controllers
 {
     [ApiController]
     [Route("api/")]
+    [Authorize]
     public class TodoTasksController : Controller
     {
         private readonly TodoTasksDbContext todoTasksDbContext;
@@ -19,17 +22,22 @@ namespace todo_list_backend.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllTodoTasks()
         {
-            return Ok(await todoTasksDbContext.TodoTasks.ToListAsync());
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            return Ok(await todoTasksDbContext.TodoTasks
+                .Where(TodoTask => TodoTask.UserId == userId)
+                .ToListAsync());
         }
 
         [HttpGet]
         [Route("{id:Guid}")]
-        [ActionName("GetTodoTaskById")]
+
         public async Task<IActionResult> GetTodoTaskById([FromRoute] Guid id)
         {
             var todoTask = await todoTasksDbContext.TodoTasks.FindAsync(id);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            if (todoTask == null)
+            if (todoTask == null || todoTask.UserId != userId)
             {
                 return NotFound();
             }
@@ -41,6 +49,7 @@ namespace todo_list_backend.Controllers
         public async Task<IActionResult> AddTodoTask(TodoTask todoTask)
         {
             todoTask.Id = Guid.NewGuid();
+            todoTask.UserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             await todoTasksDbContext.TodoTasks.AddAsync(todoTask);
             await todoTasksDbContext.SaveChangesAsync();
             return CreatedAtAction(nameof(GetTodoTaskById), new { id = todoTask.Id}, todoTask);
@@ -51,8 +60,9 @@ namespace todo_list_backend.Controllers
         public async Task<IActionResult> UpdateTodoTask([FromRoute] Guid id, [FromBody] TodoTask updatedTodoTask)
         {
             var existingTodoTask = await todoTasksDbContext.TodoTasks.FindAsync(id);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            if (existingTodoTask == null)
+            if (existingTodoTask == null || existingTodoTask.UserId != userId)
             {
                 return NotFound();
             }
@@ -73,8 +83,9 @@ namespace todo_list_backend.Controllers
         public async Task<IActionResult> DeleteTodoTask([FromRoute] Guid id)
         {
             var existingTodoTask = await todoTasksDbContext.TodoTasks.FindAsync(id);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            if (existingTodoTask == null)
+            if (existingTodoTask == null || existingTodoTask.UserId != userId)
             {
                 return NotFound();
             }

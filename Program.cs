@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -12,6 +13,11 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddAuthorization();
+
+builder.Services.AddIdentityApiEndpoints<IdentityUser>()
+    .AddEntityFrameworkStores<TodoTasksDbContext>();
 
 var connectionStringBuilder = new SqlConnectionStringBuilder(
     builder.Configuration.GetConnectionString("TodoTasksDBConnectionString"));
@@ -37,6 +43,7 @@ app.UseSwaggerUI(options =>
 );
 
 app.UseHttpsRedirection();
+app.MapGroup("/identity").MapIdentityApi<IdentityUser>();
 app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 app.UseAuthorization();
 app.MapControllers();
